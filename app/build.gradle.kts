@@ -60,9 +60,15 @@ dependencies {
     implementation("io.ktor:ktor-client-okhttp:2.3.4")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.4")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.4")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-    implementation("androidx.compose.runtime:runtime-livedata:1.6.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2")
+    implementation("androidx.compose.runtime:runtime-livedata:1.8.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    configurations.all {
+        resolutionStrategy {
+           // force("androidx.lifecycle:lifecycle-viewmodel:2.6.2")
+            force("androidx.lifecycle:lifecycle-livedata:2.6.2")
+        }
+    }
 
     implementation("io.coil-kt:coil-compose:2.4.0")
 
