@@ -47,6 +47,7 @@ import com.mahdi.rostamipour.chatgram.presenter.viewModel.UserViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
 import kotlin.math.max
 
@@ -82,38 +83,62 @@ fun ChatsListScreen(navigation : NavHostController , userViewModel: UserViewMode
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(finalUserList!!.size){
 
+
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Row(modifier = Modifier.fillMaxSize().clickable(true, onClick = {
+                    Row(modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(true, onClick = {
 
-                    })) {
+                            val user = finalUserList[it]
+                            val jsonUser = Json.encodeToString(User.serializer(), user)
+                            navigation.currentBackStackEntry?.savedStateHandle?.set("user", jsonUser)
+                            navigation.navigate("ChatScreen")
+                        })) {
 
-                        Spacer(modifier = Modifier.size(20.dp).clip(CircleShape)
-                        .background(if (finalUserList[it].isOnline) Color.Green else Color.Gray)
-                            .wrapContentWidth(Alignment.Start).wrapContentHeight(Alignment.Top))
+                        Spacer(modifier = Modifier
+                            .size(20.dp)
+                            .clip(CircleShape)
+                            .background(if (finalUserList[it].isOnline) Color.Green else Color.Gray)
+                            .wrapContentWidth(Alignment.Start)
+                            .wrapContentHeight(Alignment.Top))
 
                         Icon(painter = painterResource(R.drawable.chat_logo) , contentDescription = "" , tint = Color.Unspecified,
-                            modifier = Modifier.wrapContentWidth(Alignment.Start).size(80.dp))
+                            modifier = Modifier
+                                .wrapContentWidth(Alignment.Start)
+                                .size(80.dp))
 
 
-                        Row(modifier = Modifier.weight(1f).fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween,
+                        Row(modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically) {
-                            Column(modifier = Modifier.weight(1f).padding(2.dp), verticalArrangement = Arrangement.Center) {
+                            Column(modifier = Modifier
+                                .weight(1f)
+                                .padding(2.dp), verticalArrangement = Arrangement.Center) {
                                 Text(finalUserList[it].name, maxLines = 1 ,
-                                    overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                    overflow = TextOverflow.Ellipsis,
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                                     color = Color.White)
 
                                 Text(finalUserList[it].message?:"Start chat with ${finalUserList[it].name}", maxLines = 1,
                                     overflow = TextOverflow.Ellipsis)
                             }
 
-                            Text(finalUserList[it].date?:"7/18/25" , modifier = Modifier.wrapContentWidth(
-                                Alignment.End).wrapContentHeight(Alignment.Top).padding(end = 8.dp), fontSize = 12.sp)
+                            Text(finalUserList[it].date?:"7/18/25" , modifier = Modifier
+                                .wrapContentWidth(
+                                    Alignment.End
+                                )
+                                .wrapContentHeight(Alignment.Top)
+                                .padding(end = 8.dp), fontSize = 12.sp)
                         }
 
                     }
 
                     if (it != finalUserList.lastIndex){
-                        Spacer(modifier = Modifier.fillMaxWidth().height(0.5.dp).background(Color.Black))
+                        Spacer(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(0.5.dp)
+                            .background(Color.Black))
                     }
 
                 }

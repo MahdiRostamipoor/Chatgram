@@ -37,11 +37,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mahdi.rostamipour.chatgram.data.service.MyPreferences
+import com.mahdi.rostamipour.chatgram.domain.models.User
+import com.mahdi.rostamipour.chatgram.presenter.screen.ChatScreen
 import com.mahdi.rostamipour.chatgram.presenter.screen.ChatsListScreen
 import com.mahdi.rostamipour.chatgram.presenter.screen.RegisterScreen
 import com.mahdi.rostamipour.chatgram.presenter.screen.SplashScreen
 import com.mahdi.rostamipour.chatgram.presenter.viewModel.SocketViewModel
 import com.mahdi.rostamipour.chatgram.ui.theme.ChatgramTheme
+import kotlinx.serialization.json.Json
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -102,6 +105,22 @@ fun MainChatgram() {
                             modifier = Modifier.wrapContentWidth(Alignment.End))}
                     }
                 } , Modifier.padding(0.dp))
+            }else if (currentBackStackEntry?.destination?.route == "ChatScreen"){
+                TopAppBar(title = {
+                    Row(Modifier.fillMaxWidth().fillMaxHeight(), horizontalArrangement = Arrangement.SpaceBetween
+                        , verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = {
+
+                        }) { Icon(Icons.Default.Menu , contentDescription = "" , tint = Color.White)}
+
+                        Text("Chatgram" , style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                            color = Color.White , fontSize = 16.sp)
+                        IconButton(onClick = {
+
+                        }) { Icon(Icons.Default.Search , contentDescription = "" , tint = Color.White ,
+                            modifier = Modifier.wrapContentWidth(Alignment.End))}
+                    }
+                } , Modifier.padding(0.dp))
             }
         }) {  innerPadding ->
         NavHost(navController = navController, startDestination = "SplashScreen" , modifier = Modifier.padding(innerPadding)){
@@ -115,6 +134,12 @@ fun MainChatgram() {
 
             composable("ChatsListScreen") {
                 ChatsListScreen(navController)
+            }
+
+            composable("ChatScreen") {
+                val jsonUser = navController.previousBackStackEntry?.savedStateHandle?.get<String>("user")
+                val user = jsonUser?.let { Json.decodeFromString(User.serializer(), it) }
+                user?.let { it1 -> ChatScreen(navigation = navController,user = it1) }
             }
         }
     }

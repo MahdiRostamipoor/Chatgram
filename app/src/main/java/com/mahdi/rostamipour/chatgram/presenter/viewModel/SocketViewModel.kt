@@ -18,7 +18,6 @@ class SocketViewModel(private val socketUseCase: SocketUseCase) : ViewModel(){
     private val _updateUsers = MutableStateFlow<List<User>?>(null)
     val updateUsers : StateFlow<List<User>?> = _updateUsers
 
-
     init {
         updateUsers()
         getMessage()

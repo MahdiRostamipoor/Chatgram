@@ -57,6 +57,16 @@ class ApiService {
     }
 
 
+    suspend fun getMessages(senderId : Int , getterId : Int) : List<GetMessage>{
+        return httpClient.get("http://10.166.182.222:3000/getmessages"){
+            url{
+                parameters.append("senderId",senderId.toString())
+                parameters.append("getterId",getterId.toString())
+            }
+        }.body()
+    }
+
+
 
     private var socketSession: WebSocketSession? = null
     val incomingMessages = MutableSharedFlow<GetMessage>(replay = 0, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_LATEST)

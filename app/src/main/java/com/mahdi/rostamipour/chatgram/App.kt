@@ -1,12 +1,15 @@
 package com.mahdi.rostamipour.chatgram
 
 import android.app.Application
+import com.mahdi.rostamipour.chatgram.data.repositoryImpl.MessagesRepositoryImpl
 import com.mahdi.rostamipour.chatgram.data.repositoryImpl.SocketRepositoryImpl
 import com.mahdi.rostamipour.chatgram.data.repositoryImpl.UserRepositoryImpl
 import com.mahdi.rostamipour.chatgram.data.service.ApiService
 import com.mahdi.rostamipour.chatgram.data.service.MyPreferences
+import com.mahdi.rostamipour.chatgram.domain.usecase.MessageUseCase
 import com.mahdi.rostamipour.chatgram.domain.usecase.SocketUseCase
 import com.mahdi.rostamipour.chatgram.domain.usecase.UserUseCase
+import com.mahdi.rostamipour.chatgram.presenter.viewModel.MessageViewModel
 import com.mahdi.rostamipour.chatgram.presenter.viewModel.SocketViewModel
 import com.mahdi.rostamipour.chatgram.presenter.viewModel.UserViewModel
 import org.koin.android.ext.koin.androidContext
@@ -27,9 +30,11 @@ class App : Application(){
 
             single { UserUseCase(UserRepositoryImpl(get())) }
             single { SocketUseCase(SocketRepositoryImpl(get())) }
+            single { MessageUseCase(MessagesRepositoryImpl(get())) }
 
             viewModel { UserViewModel(get()) }
             viewModel { SocketViewModel(get()) }
+            viewModel { MessageViewModel(get()) }
 
         }
 
