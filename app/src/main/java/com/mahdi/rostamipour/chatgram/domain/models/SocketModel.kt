@@ -6,13 +6,15 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 
 @Serializable
 data class GetMessage(
+    val id : Int,
     val bio: String,
     val date: String,
     val getterId: Int,
     val message: String,
     val name: String,
     val senderId: Int,
-    val typeMessage: String
+    val typeMessage: String,
+    val seen : Int
 )
 
 @Serializable

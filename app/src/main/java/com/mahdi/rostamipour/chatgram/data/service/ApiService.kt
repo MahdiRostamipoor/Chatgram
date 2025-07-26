@@ -3,6 +3,7 @@ package com.mahdi.rostamipour.chatgram.data.service
 import android.util.Log
 import com.mahdi.rostamipour.chatgram.domain.models.GetMessage
 import com.mahdi.rostamipour.chatgram.domain.models.IdentifyMessage
+import com.mahdi.rostamipour.chatgram.domain.models.SendMessage
 import com.mahdi.rostamipour.chatgram.domain.models.SocketEvent
 import com.mahdi.rostamipour.chatgram.domain.models.User
 import io.ktor.client.HttpClient
@@ -41,7 +42,7 @@ class ApiService {
     }
 
     suspend fun registerUser(name : String , bio : String) : String{
-        return httpClient.post("http://10.166.182.222:3000/register"){
+        return httpClient.post("http://10.128.50.222:3000/register"){
             contentType(ContentType.Application.Json)
             setBody(mapOf("name" to name , "bio" to bio , "picProfile" to ""))
         }.body()
@@ -49,7 +50,7 @@ class ApiService {
 
 
     suspend fun getUsers(userId : Int) : List<User>{
-        return httpClient.get("http://10.166.182.222:3000/users"){
+        return httpClient.get("http://10.128.50.222:3000/users"){
             url {
                 parameters.append("userId" , userId.toString())
             }
@@ -58,11 +59,18 @@ class ApiService {
 
 
     suspend fun getMessages(senderId : Int , getterId : Int) : List<GetMessage>{
-        return httpClient.get("http://10.166.182.222:3000/getmessages"){
+        return httpClient.get("http://10.128.50.222:3000/getmessages"){
             url{
                 parameters.append("senderId",senderId.toString())
                 parameters.append("getterId",getterId.toString())
             }
+        }.body()
+    }
+
+    suspend fun sendMessage(sendMessage: SendMessage) : GetMessage{
+        return httpClient.post("http://10.128.50.222:3000/sendmessage"){
+            contentType(ContentType.Application.Json)
+            setBody(sendMessage)
         }.body()
     }
 
@@ -73,7 +81,7 @@ class ApiService {
     val incomingUsers = MutableSharedFlow<List<User>>(replay = 0, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_LATEST)
 
     suspend fun connectSocket(userId : Int) {
-        httpClient.webSocket("ws://10.166.182.222:3000") {
+        httpClient.webSocket("ws://10.128.50.222:3000") {
             socketSession = this
 
             val identifyJson = Json.encodeToString(IdentifyMessage(userId = userId))

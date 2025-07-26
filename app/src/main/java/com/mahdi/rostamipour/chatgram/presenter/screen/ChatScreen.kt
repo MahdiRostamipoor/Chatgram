@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,10 +40,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.mahdi.rostamipour.chatgram.R
 import com.mahdi.rostamipour.chatgram.data.service.MyPreferences
 import com.mahdi.rostamipour.chatgram.domain.models.GetMessage
+import com.mahdi.rostamipour.chatgram.domain.models.SendMessage
 import com.mahdi.rostamipour.chatgram.domain.models.User
 import com.mahdi.rostamipour.chatgram.presenter.viewModel.MessageViewModel
 import com.mahdi.rostamipour.chatgram.presenter.viewModel.SocketViewModel
@@ -58,17 +61,31 @@ fun ChatScreen(navigation : NavHostController, user : User, socketViewModel: Soc
 
     val messageApi by messageViewModel.messages.collectAsState()
     val messageSocket by socketViewModel.message.collectAsState()
+    val sendMessage by messageViewModel.stateSendMessage.collectAsState()
 
-    val finalListMessages = remember(messageApi,messageSocket) {
-        val mutableList = messageApi.toMutableList()
-        messageSocket?.let {
-            if (!mutableList.contains(it)){
-                mutableList.add(it)
-            }
+    val finalListMessages = remember(messageApi) {
+        mutableStateListOf<GetMessage>().apply {
+            clear()
+            addAll(messageApi.asReversed())
         }
-        mutableList
     }
 
+    // اضافه کردن پیام سوکت
+    LaunchedEffect(messageSocket) {
+        messageSocket?.let {
+            if (finalListMessages.none { msg -> msg.id == it.id }) {
+                finalListMessages.add(0, it)
+            }
+        }
+    }
+
+    LaunchedEffect(sendMessage) {
+        sendMessage?.let {
+            if (finalListMessages.none { msg -> msg.id == it.id }) {
+                finalListMessages.add(0, it)
+            }
+        }
+    }
 
     val chatListState = rememberLazyListState()
     LaunchedEffect(finalListMessages.size) {
@@ -111,16 +128,20 @@ fun ChatScreen(navigation : NavHostController, user : User, socketViewModel: Soc
 
                 if (textMessage.isNotEmpty()){
                     IconButton(onClick = {
+                        val sendMessage = SendMessage(MyPreferences.userId?:0,user.id,textMessage,
+                            "text","7/25/2025")
 
+                        messageViewModel.sendMessage(sendMessage)
+                        textMessage = ""
                     }){
-                        Icon(Icons.Default.Send, tint = Color.Unspecified, contentDescription = null,
+                        Icon(Icons.Default.Send, tint = Color.White, contentDescription = null,
                             modifier = Modifier.fillMaxHeight().wrapContentHeight(Alignment.CenterVertically))
                     }
                 }else{
                     IconButton(onClick = {
 
                     }){
-                        Icon(painter = painterResource(R.drawable.link), tint = Color.Unspecified, contentDescription = null,
+                        Icon(painter = painterResource(R.drawable.link), tint = Color.White, contentDescription = null,
                             modifier = Modifier.fillMaxHeight().wrapContentHeight(Alignment.CenterVertically))
                     }
                 }
@@ -146,12 +167,20 @@ fun ListMyMessage(getMessage: GetMessage){
                 topStart = if (isMyMessage) 2.dp else 8.dp , bottomStart = if (isMyMessage) 2.dp else 8.dp ,
                 bottomEnd = if (isMyMessage) 8.dp else 2.dp)) {
             Column {
-                Text(getMessage.message, modifier = Modifier.padding(4.dp), color = Color.Black)
+                Text(getMessage.message, modifier = Modifier.padding(4.dp), color = Color.White)
+
+                Row(Modifier.padding(4.dp), horizontalArrangement = Arrangement.Start , verticalAlignment = Alignment.CenterVertically) {
+                    if (isMyMessage){
+                        Icon(painter = painterResource(if (getMessage.seen == 0) R.drawable.unseen else R.drawable.seen) ,
+                            contentDescription = null ,
+                            tint = Color.Unspecified)
+                    }
+
+                    Text(getMessage.date, modifier = Modifier.padding(4.dp), color = Color.White , fontSize = 8.sp)
+                }
+
             }
         }
 
     }
-
-
-
 }
