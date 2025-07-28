@@ -2,6 +2,7 @@ package com.mahdi.rostamipour.chatgram.data.repositoryImpl
 
 import com.mahdi.rostamipour.chatgram.data.service.ApiService
 import com.mahdi.rostamipour.chatgram.domain.models.GetMessage
+import com.mahdi.rostamipour.chatgram.domain.models.Typing
 import com.mahdi.rostamipour.chatgram.domain.models.User
 import com.mahdi.rostamipour.chatgram.domain.repository.SocketRepository
 import kotlinx.coroutines.CoroutineScope
@@ -34,11 +35,19 @@ class SocketRepositoryImpl(private val apiService: ApiService) : SocketRepositor
 
     override fun observeUsers(): Flow<List<User>> = apiService.incomingUsers
 
+    override fun observeTyping(): Flow<Typing> = apiService.incomingTyping
 
     override suspend fun sendMessage(message: String) {
 
     }
 
+    override suspend fun isTyping(senderId: Int, getterId: Int) {
+        apiService.isTyping(senderId,getterId)
+    }
+
+    override suspend fun stopTyping(senderId: Int, getterId: Int) {
+        apiService.stopTyping(senderId,getterId)
+    }
 
 
 }

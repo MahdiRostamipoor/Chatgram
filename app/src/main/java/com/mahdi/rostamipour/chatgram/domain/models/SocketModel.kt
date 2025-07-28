@@ -18,6 +18,12 @@ data class GetMessage(
 )
 
 @Serializable
+data class Typing(
+    val senderId: Int ,
+    val getterId: Int
+)
+
+@Serializable
 @JsonClassDiscriminator("type")
 sealed class SocketEvent {
     @Serializable
@@ -27,4 +33,8 @@ sealed class SocketEvent {
     @Serializable
     @SerialName("newMessage")
     data class MessageReceived(val data: GetMessage) : SocketEvent()
+
+    @Serializable
+    @SerialName("isTyping")
+    data class TypingReceived(val data: Typing) : SocketEvent()
 }

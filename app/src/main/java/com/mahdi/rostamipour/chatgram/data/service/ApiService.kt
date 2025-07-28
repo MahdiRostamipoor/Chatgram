@@ -5,6 +5,8 @@ import com.mahdi.rostamipour.chatgram.domain.models.GetMessage
 import com.mahdi.rostamipour.chatgram.domain.models.IdentifyMessage
 import com.mahdi.rostamipour.chatgram.domain.models.SendMessage
 import com.mahdi.rostamipour.chatgram.domain.models.SocketEvent
+import com.mahdi.rostamipour.chatgram.domain.models.StateTyping
+import com.mahdi.rostamipour.chatgram.domain.models.Typing
 import com.mahdi.rostamipour.chatgram.domain.models.User
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -79,6 +81,7 @@ class ApiService {
     private var socketSession: WebSocketSession? = null
     val incomingMessages = MutableSharedFlow<GetMessage>(replay = 0, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_LATEST)
     val incomingUsers = MutableSharedFlow<List<User>>(replay = 0, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_LATEST)
+    val incomingTyping = MutableSharedFlow<Typing>(replay = 0, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_LATEST)
 
     suspend fun connectSocket(userId : Int) {
         httpClient.webSocket("ws://10.169.162.222:3000") {
@@ -95,6 +98,7 @@ class ApiService {
                     polymorphic(SocketEvent::class) {
                         subclass(SocketEvent.UserListUpdate::class, SocketEvent.UserListUpdate.serializer())
                         subclass(SocketEvent.MessageReceived::class, SocketEvent.MessageReceived.serializer())
+                        subclass(SocketEvent.TypingReceived::class, SocketEvent.TypingReceived.serializer())
                     }
                 }
                 classDiscriminator = "type"
@@ -114,6 +118,10 @@ class ApiService {
                             is SocketEvent.UserListUpdate -> {
                                 incomingUsers.tryEmit(event.data)
                             }
+
+                            is SocketEvent.TypingReceived ->{
+                                incomingTyping.tryEmit(event.data)
+                            }
                         }
                     } catch (e: Exception) {
                         Log.e("WebSocket", "Json decode error", e)
@@ -121,6 +129,18 @@ class ApiService {
                 }
             }
         }
+    }
+
+    suspend fun isTyping(senderId: Int , getterId: Int){
+        val identifyJson = Json.encodeToString(StateTyping(type = "isTyping" , senderId = senderId, getterId = getterId))
+
+        socketSession?.send(Frame.Text(identifyJson))
+    }
+
+    suspend fun stopTyping(senderId: Int , getterId: Int){
+        val identifyJson = Json.encodeToString(StateTyping(type = "stopTyping" , senderId = senderId, getterId = getterId))
+
+        socketSession?.send(Frame.Text(identifyJson))
     }
 
     suspend fun disconnectSocket(){

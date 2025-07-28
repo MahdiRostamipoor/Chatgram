@@ -43,6 +43,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +56,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -73,6 +76,8 @@ import com.mahdi.rostamipour.chatgram.presenter.viewModel.SocketViewModel
 import com.mahdi.rostamipour.chatgram.ui.theme.ChatgramTheme
 import com.mahdi.rostamipour.chatgram.ui.theme.DarkBackground
 import com.mahdi.rostamipour.chatgram.ui.theme.DarkSurface
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -95,7 +100,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ChatgramTheme {
-                MainChatgram()
+                MainChatgram(socketViewModel)
             }
         }
 
@@ -112,7 +117,9 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainChatgram() {
+fun MainChatgram(socketViewModel : SocketViewModel) {
+
+    val context = LocalContext.current
 
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -121,6 +128,12 @@ fun MainChatgram() {
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    val stateTyping by socketViewModel.typing.collectAsState()
+
+    LaunchedEffect(stateTyping) {
+        socketViewModel.getTyping()
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
