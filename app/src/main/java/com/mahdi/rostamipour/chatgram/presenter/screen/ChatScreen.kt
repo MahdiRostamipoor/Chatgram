@@ -66,7 +66,7 @@ fun ChatScreen(navigation : NavHostController, user : User, socketViewModel: Soc
     val finalListMessages = remember(messageApi) {
         mutableStateListOf<GetMessage>().apply {
             clear()
-            addAll(messageApi.asReversed())
+            addAll(messageApi)
         }
     }
 
@@ -74,7 +74,7 @@ fun ChatScreen(navigation : NavHostController, user : User, socketViewModel: Soc
     LaunchedEffect(messageSocket) {
         messageSocket?.let {
             if (finalListMessages.none { msg -> msg.id == it.id }) {
-                finalListMessages.add(0, it)
+                finalListMessages.add(0,it)
             }
         }
     }
@@ -82,7 +82,7 @@ fun ChatScreen(navigation : NavHostController, user : User, socketViewModel: Soc
     LaunchedEffect(sendMessage) {
         sendMessage?.let {
             if (finalListMessages.none { msg -> msg.id == it.id }) {
-                finalListMessages.add(0, it)
+                finalListMessages.add(0,it)
             }
         }
     }
