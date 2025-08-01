@@ -4,8 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -34,7 +35,7 @@ import com.mahdi.rostamipour.chatgram.ui.theme.DarkBackground
 import com.mahdi.rostamipour.chatgram.ui.theme.DarkSurface
 
 @Composable
-fun DialogProfile(name : String , bia : String , onDismiss : () -> Unit){
+fun DialogProfile(name : String, bio : String, onDismiss : () -> Unit){
 
     var isChecked by remember { mutableStateOf(false) }
 
@@ -43,25 +44,28 @@ fun DialogProfile(name : String , bia : String , onDismiss : () -> Unit){
 
         Box(modifier = Modifier.padding(10.dp).background(color = DarkBackground, shape = RoundedCornerShape(16.dp))){
 
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column {
 
-                Row(modifier = Modifier.fillMaxWidth().background(DarkSurface)) {
+                Row(modifier = Modifier.fillMaxWidth().background(DarkSurface).padding(20.dp)) {
 
                     Icon(painter = painterResource(R.drawable.logo), modifier = Modifier.size(40.dp).clip(
                         CircleShape
                     ), contentDescription = null)
 
                     Text(name , style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                        color = Color.White , fontSize = 14.sp , modifier = Modifier.padding(4.dp))
+                        color = Color.White , fontSize = 14.sp , modifier = Modifier.padding(8.dp))
                 }
 
+                Text("Bio" , fontSize = 12.sp , modifier = Modifier.padding(4.dp))
 
-                Text(bia , style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                    color = Color.White , fontSize = 14.sp , modifier = Modifier.padding(4.dp))
+                Text(bio , style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                    color = Color.White , fontSize = 14.sp , modifier = Modifier.padding(8.dp))
+
+                Spacer(modifier = Modifier.fillMaxWidth().height(0.5.dp).padding(top = 8.dp, bottom = 8.dp).background(DarkSurface))
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)
                 ) {
                     Text(text = "Notification", modifier = Modifier.weight(1f).wrapContentWidth(Alignment.Start))
                     Switch(

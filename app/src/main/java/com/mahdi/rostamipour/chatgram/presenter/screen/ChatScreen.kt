@@ -1,5 +1,7 @@
 package com.mahdi.rostamipour.chatgram.presenter.screen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -52,7 +54,12 @@ import com.mahdi.rostamipour.chatgram.presenter.viewModel.SocketViewModel
 import com.mahdi.rostamipour.chatgram.ui.theme.DarkSurface
 import com.mahdi.rostamipour.chatgram.ui.theme.Divider
 import org.koin.androidx.compose.koinViewModel
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ChatScreen(navigation : NavHostController, user : User, socketViewModel: SocketViewModel = koinViewModel(),
                messageViewModel: MessageViewModel = koinViewModel()) {
@@ -62,6 +69,11 @@ fun ChatScreen(navigation : NavHostController, user : User, socketViewModel: Soc
     val messageApi by messageViewModel.messages.collectAsState()
     val messageSocket by socketViewModel.message.collectAsState()
     val sendMessage by messageViewModel.stateSendMessage.collectAsState()
+
+    val currentTime = LocalTime.now()
+    val timeString = currentTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+
+    val nowDate = LocalDate.now()
 
     val finalListMessages = remember(messageApi) {
         mutableStateListOf<GetMessage>().apply {
@@ -129,7 +141,7 @@ fun ChatScreen(navigation : NavHostController, user : User, socketViewModel: Soc
                 if (textMessage.isNotEmpty()){
                     IconButton(onClick = {
                         val sendMessage = SendMessage(MyPreferences.userId?:0,user.id,textMessage,
-                            "text","7/25/2025")
+                            "text","$nowDate $timeString")
 
                         messageViewModel.sendMessage(sendMessage)
                         textMessage = ""
@@ -153,10 +165,17 @@ fun ChatScreen(navigation : NavHostController, user : User, socketViewModel: Soc
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ListMyMessage(getMessage: GetMessage){
 
     val isMyMessage : Boolean = if(getMessage.senderId == MyPreferences.userId) true else false
+
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+    val dateTime = LocalDateTime.parse(getMessage.date, formatter)
+
+    val dateShow = if (dateTime.toLocalDate().isEqual(LocalDate.now()))
+        dateTime.format(DateTimeFormatter.ofPattern("HH:mm")) else getMessage.date
 
     Row(modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = if (isMyMessage) Arrangement.Start else Arrangement.End) {
@@ -176,7 +195,7 @@ fun ListMyMessage(getMessage: GetMessage){
                             tint = Color.Unspecified)
                     }
 
-                    Text(getMessage.date, modifier = Modifier.padding(4.dp), color = Color.White , fontSize = 8.sp)
+                    Text(dateShow, modifier = Modifier.padding(4.dp), color = Color.White , fontSize = 8.sp)
                 }
 
             }

@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -42,6 +43,9 @@ import androidx.navigation.NavHostController
 import com.mahdi.rostamipour.chatgram.R
 import com.mahdi.rostamipour.chatgram.data.service.MyPreferences
 import com.mahdi.rostamipour.chatgram.domain.models.User
+import com.mahdi.rostamipour.chatgram.presenter.NameAvatar
+import com.mahdi.rostamipour.chatgram.presenter.getColorFromName
+import com.mahdi.rostamipour.chatgram.presenter.getInitials
 import com.mahdi.rostamipour.chatgram.presenter.viewModel.SocketViewModel
 import com.mahdi.rostamipour.chatgram.presenter.viewModel.UserViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -49,6 +53,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
+import java.time.LocalDate
 import kotlin.math.max
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -86,8 +91,12 @@ fun ChatsListScreen(navigation : NavHostController , userViewModel: UserViewMode
 
                 Column(modifier = Modifier.fillMaxSize()) {
                     Row(modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxSize().padding(top = 8.dp, bottom = 8.dp, start = 4.dp)
                         .clickable(true, onClick = {
+
+                            //val today = LocalDate.now()
+
+                            //Toast.makeText(context,today.toString(), Toast.LENGTH_SHORT).show()
 
                             val user = finalUserList[it]
                             val jsonUser = Json.encodeToString(User.serializer(), user)
@@ -102,14 +111,11 @@ fun ChatsListScreen(navigation : NavHostController , userViewModel: UserViewMode
                             .wrapContentWidth(Alignment.Start)
                             .wrapContentHeight(Alignment.Top))
 
-                        Icon(painter = painterResource(R.drawable.chat_logo) , contentDescription = "" , tint = Color.Unspecified,
-                            modifier = Modifier
-                                .wrapContentWidth(Alignment.Start)
-                                .size(80.dp))
-
+                        NameAvatar(finalUserList[it].name, modifier = Modifier
+                            .wrapContentWidth(Alignment.Start))
 
                         Row(modifier = Modifier
-                            .weight(1f)
+                            .weight(1f).padding(start = 8.dp)
                             .fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically) {
                             Column(modifier = Modifier
@@ -124,7 +130,7 @@ fun ChatsListScreen(navigation : NavHostController , userViewModel: UserViewMode
                                     overflow = TextOverflow.Ellipsis)
                             }
 
-                            Text(finalUserList[it].date?:"7/18/25" , modifier = Modifier
+                            Text(finalUserList[it].date?:"" , modifier = Modifier
                                 .wrapContentWidth(
                                     Alignment.End
                                 )
