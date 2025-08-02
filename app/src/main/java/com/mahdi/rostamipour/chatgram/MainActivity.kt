@@ -1,6 +1,7 @@
 package com.mahdi.rostamipour.chatgram
 
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
@@ -8,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -67,6 +69,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mahdi.rostamipour.chatgram.data.service.MyPreferences
 import com.mahdi.rostamipour.chatgram.domain.models.User
+import com.mahdi.rostamipour.chatgram.presenter.NameAvatar
 import com.mahdi.rostamipour.chatgram.presenter.screen.ChatScreen
 import com.mahdi.rostamipour.chatgram.presenter.screen.ChatsListScreen
 import com.mahdi.rostamipour.chatgram.presenter.screen.DialogProfile
@@ -115,6 +118,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainChatgram(socketViewModel : SocketViewModel) {
@@ -125,6 +129,8 @@ fun MainChatgram(socketViewModel : SocketViewModel) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     var isShowProfileDialog by remember { mutableStateOf(false) }
 
+    var userName by remember { mutableStateOf("") }
+    var userBio by remember { mutableStateOf("") }
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -362,6 +368,11 @@ fun MainChatgram(socketViewModel : SocketViewModel) {
                         }
                     } , Modifier.padding(0.dp))
                 }else if (currentBackStackEntry?.destination?.route == "ChatScreen"){
+
+                    val userModel = navController.previousBackStackEntry?.savedStateHandle?.get<User>("user")
+
+                    userName = userModel?.name?:""
+                    userBio = userModel?.bio?:""
                     TopAppBar(title = {
                         Row(Modifier
                             .fillMaxWidth()
@@ -377,14 +388,19 @@ fun MainChatgram(socketViewModel : SocketViewModel) {
                                     isShowProfileDialog = true
                                 })) {
 
-                                Icon(painter = painterResource(R.drawable.logo), modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(
-                                        CircleShape
-                                    ), contentDescription = null)
+                                NameAvatar(userName ,modifier = Modifier
+                                    .wrapContentWidth(Alignment.Start))
 
-                                Text("Chatgram" , style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                                    color = Color.White , fontSize = 14.sp , modifier = Modifier.padding(4.dp))
+                                Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
+                                    Text(userName , style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                        color = Color.White , fontSize = 14.sp , modifier = Modifier.padding(start = 4.dp))
+
+                                    Text("last seen recently" , fontSize = 12.sp , modifier = Modifier.padding(start = 4.dp))
+
+
+                                }
+
+
                             }
 
 
@@ -406,16 +422,15 @@ fun MainChatgram(socketViewModel : SocketViewModel) {
                 }
 
                 composable("ChatScreen") {
-                    val jsonUser = navController.previousBackStackEntry?.savedStateHandle?.get<String>("user")
-                    val user = jsonUser?.let { Json.decodeFromString(User.serializer(), it) }
-                    user?.let { it1 -> ChatScreen(navigation = navController,user = it1) }
+                    val model = navController.previousBackStackEntry?.savedStateHandle?.get<User>("user")
+                    model?.let { user -> ChatScreen(navigation = navController,user = user) }
                 }
             }
 
             if (isShowProfileDialog) {
                 DialogProfile(
-                    "Mrp",
-                    "My name is Mahdi Rostamipour",
+                    userName,
+                    userBio,
                     onDismiss = {
                         isShowProfileDialog = false
                     })

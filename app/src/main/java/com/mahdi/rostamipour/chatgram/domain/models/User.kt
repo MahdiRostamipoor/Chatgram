@@ -1,8 +1,11 @@
 package com.mahdi.rostamipour.chatgram.domain.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
 @Serializable
+@Parcelize
 data class User(
     val bio: String?,
     val date: String?,
@@ -12,4 +15,4 @@ data class User(
     val name: String,
     val seen: Int?,
     val typeMessage: String?
-)
+): Parcelable

@@ -93,14 +93,7 @@ fun ChatsListScreen(navigation : NavHostController , userViewModel: UserViewMode
                     Row(modifier = Modifier
                         .fillMaxSize().padding(top = 8.dp, bottom = 8.dp, start = 4.dp)
                         .clickable(true, onClick = {
-
-                            //val today = LocalDate.now()
-
-                            //Toast.makeText(context,today.toString(), Toast.LENGTH_SHORT).show()
-
-                            val user = finalUserList[it]
-                            val jsonUser = Json.encodeToString(User.serializer(), user)
-                            navigation.currentBackStackEntry?.savedStateHandle?.set("user", jsonUser)
+                            navigation.currentBackStackEntry?.savedStateHandle?.set("user", finalUserList[it])
                             navigation.navigate("ChatScreen")
                         })) {
 

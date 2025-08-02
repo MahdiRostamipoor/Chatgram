@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.mahdi.rostamipour.chatgram.R
+import com.mahdi.rostamipour.chatgram.presenter.NameAvatar
 import com.mahdi.rostamipour.chatgram.ui.theme.DarkBackground
 import com.mahdi.rostamipour.chatgram.ui.theme.DarkSurface
 
@@ -48,18 +49,20 @@ fun DialogProfile(name : String, bio : String, onDismiss : () -> Unit){
 
                 Row(modifier = Modifier.fillMaxWidth().background(DarkSurface).padding(20.dp)) {
 
-                    Icon(painter = painterResource(R.drawable.logo), modifier = Modifier.size(40.dp).clip(
-                        CircleShape
-                    ), contentDescription = null)
+                    NameAvatar(name ,modifier = Modifier
+                        .wrapContentWidth(Alignment.Start))
 
                     Text(name , style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                         color = Color.White , fontSize = 14.sp , modifier = Modifier.padding(8.dp))
                 }
 
-                Text("Bio" , fontSize = 12.sp , modifier = Modifier.padding(4.dp))
+                if (bio.isNotEmpty()){
+                    Text("Bio" , fontSize = 12.sp , modifier = Modifier.padding(4.dp))
 
-                Text(bio , style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                    color = Color.White , fontSize = 14.sp , modifier = Modifier.padding(8.dp))
+                    Text(bio , style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = Color.White , fontSize = 14.sp , modifier = Modifier.padding(8.dp))
+
+                }
 
                 Spacer(modifier = Modifier.fillMaxWidth().height(0.5.dp).padding(top = 8.dp, bottom = 8.dp).background(DarkSurface))
 
