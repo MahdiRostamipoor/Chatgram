@@ -38,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -53,6 +54,10 @@ import com.mahdi.rostamipour.chatgram.presenter.viewModel.MessageViewModel
 import com.mahdi.rostamipour.chatgram.presenter.viewModel.SocketViewModel
 import com.mahdi.rostamipour.chatgram.ui.theme.DarkSurface
 import com.mahdi.rostamipour.chatgram.ui.theme.Divider
+import com.mahdi.rostamipour.chatgram.ui.theme.MyMessageGradiantFirst
+import com.mahdi.rostamipour.chatgram.ui.theme.MyMessageGradiantSecond
+import com.mahdi.rostamipour.chatgram.ui.theme.NotMyMessageGradiantFirst
+import com.mahdi.rostamipour.chatgram.ui.theme.NotMyMessageGradiantSecond
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -181,23 +186,29 @@ fun ListMyMessage(getMessage: GetMessage){
         horizontalArrangement = if (isMyMessage) Arrangement.Start else Arrangement.End) {
 
         Card(modifier = Modifier.padding(8.dp), colors = CardDefaults.cardColors(
-            if (isMyMessage) Divider else DarkSurface),
+            Color.Transparent),
             shape = RoundedCornerShape(topEnd = if (isMyMessage) 8.dp else 2.dp ,
                 topStart = if (isMyMessage) 2.dp else 8.dp , bottomStart = if (isMyMessage) 2.dp else 8.dp ,
-                bottomEnd = if (isMyMessage) 8.dp else 2.dp)) {
-            Column {
-                Text(getMessage.message, modifier = Modifier.padding(4.dp), color = Color.White)
+                bottomEnd = if (isMyMessage) 8.dp else 2.dp), elevation = CardDefaults.cardElevation(defaultElevation = 40.dp)) {
+            Box(modifier = Modifier.background(brush = if (isMyMessage)
+                Brush.linearGradient(colors = listOf(MyMessageGradiantFirst , MyMessageGradiantSecond)) else
+                Brush.linearGradient(colors = listOf(NotMyMessageGradiantFirst , NotMyMessageGradiantSecond))
+            )){
+                Column {
+                    Text(getMessage.message, modifier = Modifier.padding(4.dp), color = if (isMyMessage) Color.Black else Color.White)
 
-                Row(Modifier.padding(4.dp), horizontalArrangement = Arrangement.Start , verticalAlignment = Alignment.CenterVertically) {
-                    if (isMyMessage){
-                        Icon(painter = painterResource(if (getMessage.seen == 0) R.drawable.unseen else R.drawable.seen) ,
-                            contentDescription = null ,
-                            tint = Color.Unspecified)
+                    Row(Modifier.padding(4.dp), horizontalArrangement = Arrangement.Start , verticalAlignment = Alignment.CenterVertically) {
+                        if (isMyMessage){
+                            Icon(painter = painterResource(if (getMessage.seen == 0) R.drawable.unseen else R.drawable.seen) ,
+                                contentDescription = null ,
+                                tint = Color.Black)
+                        }
+
+                        Text(dateShow, modifier = Modifier.padding(4.dp),
+                            color = if (isMyMessage) Color.Black else Color.White, fontSize = 8.sp)
                     }
 
-                    Text(dateShow, modifier = Modifier.padding(4.dp), color = Color.White , fontSize = 8.sp)
                 }
-
             }
         }
 
